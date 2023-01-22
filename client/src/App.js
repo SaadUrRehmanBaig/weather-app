@@ -48,6 +48,9 @@ function App() {
 
   return (
     <div className="App">
+      <nav className="navbar bg-secondary px-2 d-flex justify-content-center" data-bs-theme="dark">
+       <h1 className='bg-secondary text-light'> Pak Weather App</h1>
+</nav>
       <div style={{ height: '100%' }}>
         <div className='text-center pt-4'>
           <label>city:

@@ -15,7 +15,7 @@ const cities_data = {}
 async function get_data(city,socket={}) {
     if (typeof (city) === 'string') {
         try {
-            const address = `http://api.weatherapi.com/v1/current.json?key=${process.env.API_KEY}&q=${city}`;
+            const address = `http://api.weatherapi.com/v1/current.json?key=${process.env.API_KEY}&q=${city}-pk`;
             const data = await axios.get(address)
             cities_data[city] = (data.data)
         }catch(e){
