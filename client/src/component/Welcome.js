@@ -7,7 +7,7 @@ function Welcome({ socket }) {
   const [temp, setTemp] = useState(true);
 
   useEffect(() => {
-    socket.emit("data-client");
+    socket.emit("my-data", email);
   }, []);
 
   useEffect(() => {

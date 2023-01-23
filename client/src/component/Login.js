@@ -2,7 +2,7 @@ import "./login.css";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-const Login = ({ socket, setShouldLogin }) => {
+const Login = ({ socket, setShouldLogin, setEmail }) => {
   const navigate = useNavigate();
   //user input
   const [user, setUser] = useState({
@@ -28,6 +28,7 @@ const Login = ({ socket, setShouldLogin }) => {
   useEffect(() => {
     socket.on("succesfully logged in", () => {
       setShouldLogin(true);
+      setEmail(user.email);
       navigate("/welcome");
     });
     socket.on("no user found", () => {

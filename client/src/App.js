@@ -12,6 +12,7 @@ const socket = io.connect("http://localhost:3001/");
 
 function App() {
   const [shouldLogin, setShouldLogin] = useState(false);
+  const [email, setEmail] = useState("");
   return (
     <div className="App">
       <BrowserRouter>
@@ -19,14 +20,20 @@ function App() {
           <Route index element={<Index socket={socket} />} />
           <Route
             path="login"
-            element={<Login socket={socket} setShouldLogin={setShouldLogin} />}
+            element={
+              <Login
+                socket={socket}
+                setShouldLogin={setShouldLogin}
+                setEmail={setEmail}
+              />
+            }
           />
           <Route path="signup" element={<Register socket={socket} />} />
           <Route
             path="welcome"
             element={
               shouldLogin ? (
-                <Welcome socket={socket} />
+                <Welcome socket={socket} email={email} />
               ) : (
                 <Index socket={socket} />
               )
