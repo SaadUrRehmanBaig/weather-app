@@ -49,13 +49,24 @@ function Welcome({ socket, email }) {
   const del = (city_data) => {
     socket.emit("delete", city_data, email);
   };
+
+  const logout = () => {
+    window.location.replace("/");
+  };
   return (
     <div>
       <nav
-        className="navbar bg-secondary px-2 d-flex justify-content-center"
+        className="navbar bg-secondary px-2 d-flex justify-content-space-between"
         data-bs-theme="dark"
       >
         <h1 className="bg-secondary text-light"> Pak Weather App</h1>
+        <button
+          type="button"
+          class="btn btn-warning float-right ml-2 mr-2"
+          onClick={logout}
+        >
+          Logout
+        </button>
       </nav>
       <div style={{ height: "100%" }}>
         <div className="text-center pt-4">
