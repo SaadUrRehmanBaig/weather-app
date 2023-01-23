@@ -30,6 +30,10 @@ function Welcome({ socket, email }) {
       socket.emit("data-client");
     });
 
+    socket.on("disconnect", () => {
+      window.location.replace("/");
+    });
+
     return () => {
       socket.disconnect();
     };
