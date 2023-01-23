@@ -1,7 +1,6 @@
 import "./App.css";
 import Welcome from "./component/Welcome";
 import Index from "./component/Index";
-// import { useEffect, useState } from 'react';
 import io from "socket.io-client";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Login from "./component/Login";

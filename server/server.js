@@ -2,28 +2,15 @@ const express = require("express");
 const cors = require("cors");
 const http = require("http");
 const socketIo = require("socket.io");
-const dotenv = require("dotenv").config();
-const axios = require("axios");
 const socketController = require("./controller/socketController");
+const {
+  get_data,
+  default_cities,
+  cities_data,
+} = require("./controller/appController");
 
 const app = express();
 app.use(cors());
-
-const default_cities = ["karachi", "lahore", "islamabad", "peshawar", "gwadar"];
-const cities_data = {};
-
-async function get_data(city, socket = {}) {
-  if (typeof city === "string") {
-    try {
-      const address = `http://api.weatherapi.com/v1/current.json?key=${process.env.API_KEY}&q=${city}`;
-      const data = await axios.get(address);
-      cities_data[city] = data.data;
-    } catch (e) {
-      socket.emit("error", {});
-      return e;
-    }
-  }
-}
 
 default_cities.map((city) => {
   get_data(city);
@@ -34,7 +21,7 @@ setInterval(async () => {
     get_data(city);
   });
   io.local.emit("data updated");
-}, 600000);
+}, 10000);
 
 const server = http.createServer(app);
 const io = socketIo(server, {
@@ -61,6 +48,10 @@ io.on("connection", (socket) => {
 
   socket.on("data-client", () =>
     socketController.data_client(cities_data, local_arr, local_data, socket)
+  );
+
+  socket.on("data-client-authenticated-user", (email) =>
+    socketController.data_client_auth(cities_data, email, socket)
   );
 
   socket.on("get_data_req", ({ city, email }) => {

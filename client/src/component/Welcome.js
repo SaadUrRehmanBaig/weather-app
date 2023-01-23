@@ -27,7 +27,7 @@ function Welcome({ socket, email }) {
 
     socket.on("data updated", () => {
       console.log("on data updated from client");
-      socket.emit("data-client");
+      socket.emit("data-client-authenticated-user", email);
     });
 
     socket.on("disconnect", () => {

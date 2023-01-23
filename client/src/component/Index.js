@@ -1,14 +1,17 @@
 import React from "react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import io from "socket.io-client";
 
-function Welcome({ socket }) {
+const socket = io.connect("http://localhost:3001/");
+
+function Welcome() {
   const [info, setInfo] = useState([]);
-  const [city, setCity] = useState("");
   const [temp, setTemp] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
+    socket.connect();
     socket.emit("data-client");
   }, []);
   useEffect(() => {
@@ -29,6 +32,11 @@ function Welcome({ socket }) {
       console.log("on data updated from client");
       socket.emit("data-client");
     });
+
+    return () => {
+      socket.close();
+      socket.disconnect();
+    };
   }, [socket]);
 
   const login = () => {

@@ -100,6 +100,15 @@ module.exports.login = (data, socket) => {
   // });
 };
 
+module.exports.data_client_auth = (cities_data, email, socket) => {
+  const { local_arr } = users[email.toLowerCase()];
+  let data = {};
+  local_arr.map((city) => {
+    data[city] = cities_data[city];
+  });
+  socket.emit("data-client", data);
+};
+
 module.exports.my_data = (email, cities_data, socket) => {
   const { local_arr } = users[email.toLowerCase()];
   let data = {};
