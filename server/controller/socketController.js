@@ -1,34 +1,47 @@
 const bcrypt = require("bcrypt");
 let users = {};
 
-module.exports.delete = (data, local_arr, local_data, socket) => {
-  if (data in local_data) {
-    delete local_data[data];
-    local_arr.splice(local_arr.indexOf(data), 1);
-    socket.emit("send-data-client", local_data);
+module.exports.delete = (city, email, cities_data, socket) => {
+  const { local_arr } = users[email.toLowerCase()];
+  if (local_arr.includes(city)) {
+    local_arr.splice(local_arr.indexOf(city), 1);
+    let data = {};
+    local_arr.map((city) => {
+      data[city] = cities_data[city];
+    });
+    console.log(users[email.toLowerCase()].local_arr);
+    socket.emit("data-client", data);
   }
 };
 
 module.exports.get_data_req = async (
   city,
+  email,
   default_cities,
   cities_data,
-  local_arr,
-  local_data,
   socket,
   get_data
 ) => {
+  const { local_arr } = users[email];
   if (
     !local_arr.includes(city) &&
     !default_cities.includes(city) &&
     city != ""
   ) {
-    local_arr.push(city);
-    default_cities.push(city);
-    await get_data(city, socket);
+    try {
+      default_cities.push(city);
+      const res = await get_data(city, socket);
+      res ? null : users[email.toLowerCase()].local_arr.push(city);
+    } catch (e) {
+      console.log(e);
+    }
   }
-  local_data[city] = cities_data[city];
-  socket.emit("send-data-client", local_data);
+  let data = {};
+  local_arr.map((city) => {
+    data[city] = cities_data[city];
+  });
+  console.log(users[email].local_arr);
+  socket.emit("data-client", data);
 };
 
 module.exports.data_client = (cities_data, local_arr, local_data, socket) => {
@@ -88,7 +101,6 @@ module.exports.login = (data, socket) => {
 };
 
 module.exports.my_data = (email, cities_data, socket) => {
-  console.log("email", email);
   const { local_arr } = users[email.toLowerCase()];
   let data = {};
   local_arr.map((city) => {

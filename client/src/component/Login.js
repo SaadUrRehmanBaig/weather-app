@@ -2,9 +2,10 @@ import "./login.css";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
+let email_user = "";
+
 const Login = ({ socket, setShouldLogin, setEmail }) => {
   const navigate = useNavigate();
-  const [em, setem] = useState("");
   //user input
   const [user, setUser] = useState({
     email: "",
@@ -14,14 +15,12 @@ const Login = ({ socket, setShouldLogin, setEmail }) => {
   //handling user input
   const handleChange = (e) => {
     setUser({ ...user, [e.target.name]: e.target.value });
-    if (e.target.name === "email") {
-      setem(e.target.value);
-    }
   };
 
   //login
   const login = () => {
     const { email, password } = user;
+    email_user = email;
     if (email && password) {
       socket.emit("login", { userData: user });
     } else {
@@ -33,8 +32,7 @@ const Login = ({ socket, setShouldLogin, setEmail }) => {
     socket.on("succesfully logged in", () => {
       const { email, password } = user;
       setShouldLogin(true);
-      setEmail(em);
-      console.log("email", em, user);
+      setEmail(email_user);
       navigate("/welcome");
     });
     socket.on("no user found", () => {

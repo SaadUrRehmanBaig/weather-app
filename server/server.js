@@ -20,7 +20,7 @@ async function get_data(city, socket = {}) {
       cities_data[city] = data.data;
     } catch (e) {
       socket.emit("error", {});
-      console.log(e);
+      return e;
     }
   }
 }
@@ -63,21 +63,21 @@ io.on("connection", (socket) => {
     socketController.data_client(cities_data, local_arr, local_data, socket)
   );
 
-  socket.on("get_data_req", (city) => {
+  socket.on("get_data_req", ({ city, email }) => {
     socketController.get_data_req(
       city,
+      email,
       default_cities,
       cities_data,
-      local_arr,
-      local_data,
       socket,
       get_data
     );
   });
 
-  socket.on("delete", (data) =>
-    socketController.delete(data, local_arr, local_data, socket)
-  );
+  socket.on("delete", (data, email) => {
+    console.log(email);
+    socketController.delete(data, email, cities_data, socket);
+  });
 
   socket.on("send_user", (data) => {
     socketController.send_user(data, local_arr, socket);

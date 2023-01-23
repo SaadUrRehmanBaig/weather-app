@@ -7,7 +7,8 @@ function Welcome({ socket, email }) {
   const [temp, setTemp] = useState(true);
 
   useEffect(() => {
-    socket.emit("data-client", email);
+    console.log(email);
+    socket.emit("my-data", email);
   }, []);
 
   useEffect(() => {
@@ -36,13 +37,13 @@ function Welcome({ socket, email }) {
 
   const get_data = () => {
     if (city !== "") {
-      socket.emit("get_data_req", city.toLowerCase());
+      socket.emit("get_data_req", { city: city.toLowerCase(), email });
       setCity("");
     }
   };
 
   const del = (city_data) => {
-    socket.emit("delete", city_data);
+    socket.emit("delete", city_data, email);
   };
   return (
     <div>
