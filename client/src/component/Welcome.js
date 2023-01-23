@@ -1,13 +1,13 @@
 import React from "react";
 import { useEffect, useState } from "react";
 
-function Welcome({ socket }) {
+function Welcome({ socket, email }) {
   const [info, setInfo] = useState([]);
   const [city, setCity] = useState("");
   const [temp, setTemp] = useState(true);
 
   useEffect(() => {
-    socket.emit("my-data", email);
+    socket.emit("data-client", email);
   }, []);
 
   useEffect(() => {

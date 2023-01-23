@@ -18,7 +18,11 @@ module.exports.get_data_req = async (
   socket,
   get_data
 ) => {
-  if (!local_arr.includes(city) && !default_cities.includes(city)) {
+  if (
+    !local_arr.includes(city) &&
+    !default_cities.includes(city) &&
+    city != ""
+  ) {
     local_arr.push(city);
     default_cities.push(city);
     await get_data(city, socket);
@@ -34,7 +38,7 @@ module.exports.data_client = (cities_data, local_arr, local_data, socket) => {
   socket.emit("data-client", local_data);
 };
 
-module.exports.send_user = (data, socket) => {
+module.exports.send_user = (data, local_arr, socket) => {
   const { name, email, password } = data.userData;
   // const user = new User({
   //   name,
@@ -51,6 +55,7 @@ module.exports.send_user = (data, socket) => {
   users[email.toLowerCase()] = {
     name,
     password: bcrypt.hashSync(password, 8),
+    local_arr,
   };
   console.log(users);
   socket.emit("User_Registered", "User Succefully Registered");
@@ -82,6 +87,15 @@ module.exports.login = (data, socket) => {
   // });
 };
 
+module.exports.my_data = (email, cities_data, socket) => {
+  console.log("email", email);
+  const { local_arr } = users[email.toLowerCase()];
+  let data = {};
+  local_arr.map((city) => {
+    data[city] = cities_data[city];
+  });
+  socket.emit("data-client", data);
+};
 module.exports.disconnect = (socket) => {
   console.log(socket);
 };

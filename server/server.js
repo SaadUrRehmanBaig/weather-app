@@ -54,6 +54,9 @@ io.on("connection", (socket) => {
   console.log("connection established", socket.id);
   /* associate user id from socket id here*/
 
+  socket.on("my-data", (email) => {
+    socketController.my_data(email, cities_data, socket);
+  });
   socket.emit("data-client", local_data);
 
   socket.on("data-client", () =>
@@ -77,7 +80,7 @@ io.on("connection", (socket) => {
   );
 
   socket.on("send_user", (data) => {
-    socketController.send_user(data, socket);
+    socketController.send_user(data, local_arr, socket);
   });
 
   socket.on("login", (data) => socketController.login(data, socket));

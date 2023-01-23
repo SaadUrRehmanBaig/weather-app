@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 
 const Login = ({ socket, setShouldLogin, setEmail }) => {
   const navigate = useNavigate();
+  const [em, setem] = useState("");
   //user input
   const [user, setUser] = useState({
     email: "",
@@ -13,6 +14,9 @@ const Login = ({ socket, setShouldLogin, setEmail }) => {
   //handling user input
   const handleChange = (e) => {
     setUser({ ...user, [e.target.name]: e.target.value });
+    if (e.target.name === "email") {
+      setem(e.target.value);
+    }
   };
 
   //login
@@ -27,8 +31,10 @@ const Login = ({ socket, setShouldLogin, setEmail }) => {
 
   useEffect(() => {
     socket.on("succesfully logged in", () => {
+      const { email, password } = user;
       setShouldLogin(true);
-      setEmail(user.email);
+      setEmail(em);
+      console.log("email", em, user);
       navigate("/welcome");
     });
     socket.on("no user found", () => {
@@ -47,7 +53,9 @@ const Login = ({ socket, setShouldLogin, setEmail }) => {
           type="email"
           required
           name="email"
-          onChange={handleChange}
+          onChange={(e) => {
+            handleChange(e);
+          }}
           placeholder="Email"
         />
         <input
