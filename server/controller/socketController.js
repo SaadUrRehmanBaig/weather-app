@@ -65,13 +65,17 @@ module.exports.send_user = (data, local_arr, socket) => {
   //     socket.emit("User_Registered", "User Succefully Registered");
   //   }
   // });
-  users[email.toLowerCase()] = {
-    name,
-    password: bcrypt.hashSync(password, 8),
-    local_arr,
-  };
-  console.log(users);
-  socket.emit("User_Registered", "User Succefully Registered");
+  if (email in users) {
+    socket.emit("error-registering");
+  } else {
+    users[email.toLowerCase()] = {
+      name,
+      password: bcrypt.hashSync(password, 8),
+      local_arr,
+    };
+    console.log(users);
+    socket.emit("User_Registered", "User Succefully Registered");
+  }
 };
 
 module.exports.login = (data, socket) => {

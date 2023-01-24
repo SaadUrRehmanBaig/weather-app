@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./register.css";
 import { useNavigate } from "react-router-dom";
 
@@ -65,7 +65,14 @@ const Register = ({ socket }) => {
           Register
         </div>
         <div>or</div>
-        <div className="button">Login</div>
+        <div
+          className="button"
+          onClick={() => {
+            navigate("/login");
+          }}
+        >
+          Login
+        </div>
       </div>
     </div>
   );

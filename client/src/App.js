@@ -9,6 +9,10 @@ import { useState } from "react";
 
 const socket = io.connect("http://localhost:3001/");
 
+socket.on("error-registering", () => {
+  alert("user already exist");
+});
+
 function App() {
   const [shouldLogin, setShouldLogin] = useState(false);
   const [email, setEmail] = useState("");

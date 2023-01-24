@@ -21,7 +21,7 @@ setInterval(async () => {
     get_data(city);
   });
   io.local.emit("data updated");
-}, 10000);
+}, 600000);
 
 const server = http.createServer(app);
 const io = socketIo(server, {
