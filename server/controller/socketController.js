@@ -1,47 +1,65 @@
 const bcrypt = require("bcrypt");
-let users = {};
+const users_db = require("../model/userModel");
 
-module.exports.delete = (city, email, cities_data, socket) => {
-  const { local_arr } = users[email.toLowerCase()];
-  if (local_arr.includes(city)) {
-    local_arr.splice(local_arr.indexOf(city), 1);
+module.exports.delete = async (city, email, cities_data, socket) => {
+  await users_db.updateOne(
+    { email: email.toLowerCase() },
+    { $pull: { local_arr: city } }
+  );
+
+  users_db.findOne({ email: email.toLowerCase() }, (err, doc) => {
     let data = {};
-    local_arr.map((city) => {
+    doc.local_arr.map((city) => {
       data[city] = cities_data[city];
     });
-    console.log(users[email.toLowerCase()].local_arr);
     socket.emit("data-client", data);
-  }
+  });
+
+  // const { local_arr } = users[email.toLowerCase()];
+  // if (local_arr.includes(city)) {
+  //   local_arr.splice(local_arr.indexOf(city), 1);
+  //   let data = {};
+  //   local_arr.map((city) => {
+  //     data[city] = cities_data[city];
+  //   });
+  //   console.log(users[email.toLowerCase()].local_arr);
+  //   socket.emit("data-client", data);
+  // }
 };
 
 module.exports.get_data_req = async (
   city,
   email,
-  default_cities,
+  // default_cities,
   cities_data,
   socket,
   get_data
 ) => {
-  const { local_arr } = users[email];
+  let user = await users_db.find({ email });
   if (
-    !local_arr.includes(city) &&
-    !default_cities.includes(city) &&
+    !user[0].local_arr.includes(city) &&
+    !(city in cities_data) &&
     city != ""
   ) {
     try {
-      default_cities.push(city);
       const res = await get_data(city, socket);
-      res ? null : users[email.toLowerCase()].local_arr.push(city);
+      res
+        ? null
+        : await users_db.updateOne(
+            { email: email.toLowerCase() },
+            { $push: { local_arr: city } }
+          );
     } catch (e) {
       console.log(e);
     }
   }
-  let data = {};
-  local_arr.map((city) => {
-    data[city] = cities_data[city];
+  users_db.findOne({ email: email.toLowerCase() }, (err, doc) => {
+    let data = {};
+    doc.local_arr.map((city) => {
+      data[city] = cities_data[city];
+    });
+    socket.emit("data-client", data);
   });
-  console.log(users[email].local_arr);
-  socket.emit("data-client", data);
 };
 
 module.exports.data_client = (cities_data, local_arr, local_data, socket) => {
@@ -52,74 +70,66 @@ module.exports.data_client = (cities_data, local_arr, local_data, socket) => {
 };
 
 module.exports.send_user = (data, local_arr, socket) => {
-  const { name, email, password } = data.userData;
-  // const user = new User({
-  //   name,
-  //   email,
-  //   password: bcrypt.hashSync(password, 8),
-  // });
-  // user.save((err) => {
-  //   if (err) {
-  //     console.log(err);
-  //   } else {
-  //     socket.emit("User_Registered", "User Succefully Registered");
-  //   }
-  // });
-  if (email in users) {
-    socket.emit("error-registering");
-  } else {
-    users[email.toLowerCase()] = {
+  let { name, email, password } = data.userData;
+  password = bcrypt.hashSync(password, 8);
+  users_db.create(
+    {
       name,
-      password: bcrypt.hashSync(password, 8),
-      local_arr,
-    };
-    console.log(users);
-    socket.emit("User_Registered", "User Succefully Registered");
-  }
+      email: email.toLowerCase(),
+      password,
+    },
+    (err) => {
+      if (err) {
+        console.log(err);
+      } else {
+        console.log("user registred");
+        socket.emit("User_Registered", "User Succefully Registered");
+      }
+    }
+  );
 };
 
 module.exports.login = (data, socket) => {
   const { email, password } = data.userData;
-
-  if (email.toLowerCase() in users) {
-    bcrypt.compareSync(password, users[email.toLowerCase()].password)
-      ? socket.emit("succesfully logged in")
-      : socket.emit("password not matched");
-  } else {
-    socket.emit("no user found");
-  }
-  // User.findOne({ email: email }, function (err, docs) {
-  //   if (err) {
-  //     console.log(err);
-  //   } else {
-  //     console.log("Result : ", docs);
-  //     console.log(password);
-  //     console.log(docs.password);
-  //     if (bcrypt.compareSync(password, docs.password)) {
-  //       console.log("login Successfully");
-  //     } else {
-  //       console.log("password not matched");
-  //     }
-  //   }
-  // });
+  console.log(password, email);
+  users_db.findOne({ email: email.toLowerCase() }, function (err, docs) {
+    if (err) {
+      console.log(err);
+      socket.emit("no user found");
+    } else {
+      if (docs !== null) {
+        if (bcrypt.compareSync(password, docs.password)) {
+          console.log("login Successfully");
+          socket.emit("succesfully logged in");
+        } else {
+          console.log("password not matched");
+          socket.emit("password not matched");
+        }
+      } else {
+        console.log("wrong email");
+      }
+    }
+  });
 };
 
 module.exports.data_client_auth = (cities_data, email, socket) => {
-  const { local_arr } = users[email.toLowerCase()];
-  let data = {};
-  local_arr.map((city) => {
-    data[city] = cities_data[city];
+  users_db.findOne({ email: email.toLowerCase() }, (err, doc) => {
+    let data = {};
+    doc.local_arr.map((city) => {
+      data[city] = cities_data[city];
+    });
+    socket.emit("data-client", data);
   });
-  socket.emit("data-client", data);
 };
 
 module.exports.my_data = (email, cities_data, socket) => {
-  const { local_arr } = users[email.toLowerCase()];
-  let data = {};
-  local_arr.map((city) => {
-    data[city] = cities_data[city];
+  users_db.findOne({ email: email.toLowerCase() }, (err, doc) => {
+    let data = {};
+    doc.local_arr.map((city) => {
+      data[city] = cities_data[city];
+    });
+    socket.emit("data-client", data);
   });
-  socket.emit("data-client", data);
 };
 module.exports.disconnect = (socket) => {
   console.log(socket);

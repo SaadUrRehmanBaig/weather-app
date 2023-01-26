@@ -1,14 +1,14 @@
 const mongoose = require("mongoose");
 
 const defaulttCitiesData_schema = new mongoose.Schema({
-  city_name: {
+  name: {
     type: String,
-    required: true,
     unique: true,
+    required: true,
   },
   data: {
-    type: Object,
     required: true,
+    type: mongoose.Schema.Types.Mixed,
   },
 });
 
