@@ -30,17 +30,12 @@ module.exports.delete = async (city, email, cities_data, socket) => {
 module.exports.get_data_req = async (
   city,
   email,
-  // default_cities,
   cities_data,
   socket,
   get_data
 ) => {
   let user = await users_db.find({ email });
-  if (
-    !user[0].local_arr.includes(city) &&
-    !(city in cities_data) &&
-    city != ""
-  ) {
+  if (!user[0].local_arr.includes(city) && city != "") {
     try {
       const res = await get_data(city, socket);
       res

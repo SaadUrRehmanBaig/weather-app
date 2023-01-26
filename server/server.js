@@ -66,7 +66,6 @@ mongoose.connect(uri, (err) => {
         socketController.get_data_req(
           city,
           email,
-          // default_cities,
           cities_data,
           socket,
           get_data
