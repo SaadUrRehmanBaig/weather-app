@@ -1,0 +1,12 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200&display=swap');
+
+*{
+  background-color: #212529;
+  font-family: 'Poppins', sans-serif !important;
+  color: #fff ;
+}
+.tempbtn{
+  float: right;
+  margin-right:2.5rem ;
+  font-weight: 900;
+}
